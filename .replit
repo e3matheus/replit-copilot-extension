@@ -1,7 +1,7 @@
 run = "npm run dev"
 entrypoint = "src/App.jsx"
 
-hidden = [".config", "tsconfig.json", "tsconfig.node.json", "vite.config.js", ".gitignore"]
+hidden = [".config", ".git", ".gitignore"]
 
 [nix]
 channel = "stable-21_11"
@@ -26,4 +26,9 @@ language = "nodejs"
 pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
 
   [languages.javascript.languageServer]
-start = "./node_modules/.bin/typescript-language-server --stdio"
+start = "typescript-language-server --stdio"
+
+[extension]
+isExtension = true
+buildCommand = "npm run build"
+outputDirectory = "./dist"
