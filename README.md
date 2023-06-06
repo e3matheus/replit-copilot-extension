@@ -10,5 +10,5 @@ This is a Replit Extension Starter template written in React. It includes a few 
 
 1. Fork this Repl if you have not done so already
 2. Click the **Extension Devtools** button in the top-right corner of the workspace
-3. Under **Tools**, click **Open**
+3. Under **Tools**, click **Preview**
 4. Start developing your extension in `src/App.tsx`
