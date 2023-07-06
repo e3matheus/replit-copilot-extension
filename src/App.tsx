@@ -1,9 +1,17 @@
 import { DirectoryChildNode } from '@replit/extensions';
 import { useReplit } from '@replit/extensions-react';
-import { useState } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
+import { ChatCompletionRequestMessageRoleEnum } from 'openai';
+
 import './App.css'
+import { ChatGPTClient } from './ChatGPTClient';
+import CodeMetadata from './CodeMetadata';
 
 function App() {
+  const [inputValue, setInputValue] = useState('');
+  const [entityValue, setEntityValue] = useState('');
+  const [htmlValue, setHtmlValue] = useState<React.ReactNode[]>([]);
+
   // An array of file system nodes (files / folders)
   const [rootFsNodes, setRootFsNodes] = useState<Array<DirectoryChildNode>>([]);
 
@@ -38,6 +46,85 @@ function App() {
     }
   }
 
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleEntityChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEntityValue(event.target.value);
+  };
+
+  const handleAction = async (code: string, file: string, action: string) => {
+    if (replit) {
+      if (action === 'execute') {
+        // Execute the code as bash
+        try {
+          const output = await replit.exec.exec(code);
+          alert(output.output);
+        } catch (error) {
+          alert('An error occurred: ' + error);
+        }
+      } else if (action === 'replace') {
+        // Replace the file with the code. Create file and directory if not exists
+        const output = await replit.fs.writeFile(file, code);
+        alert(output);
+      } else if (action === 'append') {
+        // read file
+      
+      }
+    }
+  }
+
+  const handleFormSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
+    // Call the ChatGPT API
+
+    const chatGptMessages = [
+      {
+        role: ChatCompletionRequestMessageRoleEnum.System,
+        content: 'You are a helpful assistant.',
+      },
+      {
+        role: ChatCompletionRequestMessageRoleEnum.User,
+        content: "dame las instrucciones para " + inputValue + " de la entidad " + entityValue + "en rails, sin usar scaffold en un mensaje de 800 tokens.",
+      },
+    ];
+
+    const client = new ChatGPTClient();
+
+    const sendChatRequest = async () => {
+      const botResponse = await client.respond(chatGptMessages);
+      console.log(botResponse?.text?.toString);
+
+      const new_response: React.ReactNode[] = [];
+      const responses: string[] = (botResponse?.text?.toString() ?? "").split("```").slice(1);
+      responses.map((a: string, i: number) => {
+        if (i % 2 === 0) {
+          new_response.push(<CodeMetadata handleAction={handleAction} entity={entityValue} code={a} />);
+        } else {
+          new_response.push(a);
+        }
+      });
+
+      if (replit) {
+        setHtmlValue(new_response);
+      }
+    };
+
+    sendChatRequest();
+
+    // Clear the input
+    setInputValue('');
+    setEntityValue('');
+
+    // Write the conversation to a file
+    // await fs.writeFile('conversation.txt', JSON.stringify(newMessages));
+
+    // Update the messages
+    // setMessages(newMessages);
+  };
+
 
   if (status === "error") {
     return <div className="error">{error?.message}</div>;
@@ -47,11 +134,27 @@ function App() {
     return <div>Loading...</div>;
   }
 
+  const renderHTML = (html: React.ReactNode[]) => {
+    return (
+      <div>{html}</div>
+    );
+  };
+
   return (
     <main>
-      <div className="heading">React Replit Extension Starter</div>
+      <div className="heading">Mobile Copilot</div>
 
       <div>
+        <form onSubmit={handleFormSubmit}>
+          <textarea value={inputValue} onChange={handleInputChange} placeholder='¿Qué quieres modificar?' />
+          <br></br>
+          <input type="text" value={entityValue} onChange={handleEntityChange} placeholder='Entidad' />
+          <br></br>
+          <button type="submit" className="command-button">Send</button>
+        </form>
+
+        {renderHTML(htmlValue)}
+
         <div className="buttons">
           <button className="command-button" onClick={async () =>
             await createTestDir()}>mkdir test</button>
