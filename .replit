@@ -32,3 +32,4 @@ start = "typescript-language-server --stdio"
 isExtension = true
 buildCommand = "npm run build"
 outputDirectory = "./dist"
+extensionID = "0ee4ae24-8d58-4b07-aa41-9c4a55aeb3c1"

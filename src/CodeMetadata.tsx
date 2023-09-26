@@ -11,7 +11,7 @@ const CodeMetadata: React.FC<CodeMetadataProps> = ({ entity, code, handleAction 
   const fileTypes = codeWithoutFileType.match(/ruby|python|javascript|bash|json|html|css/);
   const fileType = fileTypes ? fileTypes[0] : undefined;
 
-  const [textareaValue, setTextareaValue] = useState(code); // Added state for textarea code
+  const [textareaValue, setTextareaValue] = useState(codeWithoutFileType); // Added state for textarea code
 
   const files = [
     `app/models/${entity.toLowerCase()}.rb`,
@@ -24,15 +24,21 @@ const CodeMetadata: React.FC<CodeMetadataProps> = ({ entity, code, handleAction 
   const actions = ['replace', 'append', 'execute'];
   const [selectedAction, setSelectedAction] = useState(actions[0]);
 
+  const textareaStyle = {
+    height: `${textareaValue.split('\n').length * 20}px`, // Set the height based on the number of lines in the textarea
+  };
+  
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleAction(textareaValue, selectedFile, selectedAction);
   };
   return (
     <form onSubmit={handleSubmit}>
+      <hr></hr>
       <textarea
         name="code"
         value={textareaValue} // Updated value to use textareaValue
+        style={textareaStyle}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
           setTextareaValue(e.target.value) // Updated state with setTextareaValue
         }

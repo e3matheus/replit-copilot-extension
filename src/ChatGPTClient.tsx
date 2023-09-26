@@ -1,13 +1,26 @@
 import { OpenAIApi, Configuration, CreateChatCompletionRequest, ChatCompletionRequestMessage } from 'openai';
+import Client from "@replit/database";
+const db = new Client();
+
+async function getSecret(secretName: string): Promise<string> {
+  const result = await db.get(secretName);
+  return String(result);
+}
 
 export class ChatGPTClient {
-    private openAI: OpenAIApi;
+    private openAI!: OpenAIApi;
+    private apiKey!: string;
 
-    constructor() {
+    async initialize() {
+        this.apiKey = (await getSecret('OPENAI_API_KEY') || '');
         const configuration = new Configuration({
-            apiKey: ' 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',
+            apiKey: this.apiKey,
         });
         this.openAI = new OpenAIApi(configuration);
+    }
+  
+    constructor() {
+        this.initialize();
     }
 
     async respond(chatGPTMessages: Array<ChatCompletionRequestMessage>) {

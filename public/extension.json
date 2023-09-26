@@ -1,15 +1,32 @@
 {
-  "name": "React Replit Extension Starter",
-  "description": "A starter template for a Replit Extension built with React",
-  "version": "0",
+  "name": "Mobile Rails Copilot",
+  "description": "Better rails scafolds",
   "tools": [
     {
-      "name": "Example Extension",
+      "name": "Mobile Rails Editor",
       "icon": "/favicon.svg",
       "handler": "/"
     }
   ],
-  "icon": "/favicon.svg",
+  "icon": "/copilot.png",
   "coverImages": null,
+  scopes: [
+
+    {
+      name: "read",
+      reason: "Read any file in your Repl"
+    },
+
+    {
+    name: "write-exec",
+    reason: "Write to any file in your Repl and execute any code"
+  },
+
+    {
+    name: "experimental-api",
+    reason: "Use experimental APIs that may be unstable, change in behavior, or be removed entirely"
+  }
+
+  ],
   // For more info: https://docs.replit.com/extensions/api/manifest
 }
